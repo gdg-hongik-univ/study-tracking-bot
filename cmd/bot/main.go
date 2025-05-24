@@ -1,29 +1,31 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/gdg-hongik-univ/study-tracking-bot/internal/discord"
+	"log"
 	"os"
 	"os/signal"
+	"syscall"
 )
 
 func main() {
-	bot, err := discord.Bot(os.Getenv("DISCORD_TOKEN"))
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	bot, err := discord.NewBot(os.Getenv("DISCORD_TOKEN"), "1198305978140065843")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	// open session
-	err = bot.Open()
+	err = bot.Start(ctx)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	defer bot.Close() // close session, after function termination
-
-	// keep bot running until there is NO os interruption (ctrl + C)
-	fmt.Println("Bot running....")
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	<-c
+	fmt.Println("Bot running…  (Ctrl-C to quit)")
+	<-ctx.Done()
+	fmt.Println(""
+	fmt.Println("Shutdown complete")
 }
