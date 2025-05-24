@@ -26,6 +26,6 @@ func main() {
 
 	fmt.Println("Bot running…  (Ctrl-C to quit)")
 	<-ctx.Done()
-	fmt.Println(""
+	fmt.Println("")
 	fmt.Println("Shutdown complete")
 }
