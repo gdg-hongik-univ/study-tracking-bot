@@ -1,4 +1,4 @@
-package test_command
+package test
 
 import (
 	"github.com/bwmarrin/discordgo"
@@ -6,11 +6,11 @@ import (
 	"strconv"
 )
 
-type TestCommand struct{}
+type Command struct{}
 
-func (c *TestCommand) Name() string                         { return "test" }
-func (c *TestCommand) Build() *discordgo.ApplicationCommand { return commands }
-func (c *TestCommand) Run(s *discordgo.Session, i *discordgo.InteractionCreate) error {
+func (c *Command) Name() string                         { return "test" }
+func (c *Command) Build() *discordgo.ApplicationCommand { return commands }
+func (c *Command) Run(s *discordgo.Session, i *discordgo.InteractionCreate) error {
 	data := i.ApplicationCommandData()
 	sub := data.Options[0]
 	var res string
@@ -106,5 +106,5 @@ func intOpt(name string) *discordgo.ApplicationCommandOption {
 }
 
 func init() {
-	command.Register(&TestCommand{})
+	command.Register(&Command{})
 }

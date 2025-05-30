@@ -7,7 +7,8 @@ import (
 	"log"
 
 	"github.com/bwmarrin/discordgo"
-	_ "github.com/gdg-hongik-univ/study-tracking-bot/internal/discord/command/test_command"
+	_ "github.com/gdg-hongik-univ/study-tracking-bot/internal/discord/command/test"
+	_ "github.com/gdg-hongik-univ/study-tracking-bot/internal/discord/handler/voice"
 )
 
 // -------- 핵심 구조체 --------
@@ -31,10 +32,12 @@ func (b *Bot) Start(ctx context.Context) error {
 	// 1) Intents
 	b.Identify.Intents = discordgo.IntentsGuilds |
 		discordgo.IntentsGuildMessages |
-		discordgo.IntentsMessageContent
+		discordgo.IntentsMessageContent |
+		discordgo.IntentsGuildVoiceStates
 
 	// 2) 핸들러 부착
-	b.attachHandlers()
+	b.attachCommands()
+	b.addHandlers()
 
 	// 3) WebSocket 열기
 	if err := b.Open(); err != nil {
@@ -53,7 +56,7 @@ func (b *Bot) Start(ctx context.Context) error {
 // ---------- 내부 메서드 ----------
 
 // attachHandlers 모든 핸들러를 여기서 등록
-func (b *Bot) attachHandlers() {
+func (b *Bot) attachCommands() {
 	// (1) Ready → Slash 커맨드 등록
 	b.AddHandlerOnce(func(s *discordgo.Session, r *discordgo.Ready) {
 		raw := make([]*discordgo.ApplicationCommand, 0, len(command.All()))
@@ -77,7 +80,11 @@ func (b *Bot) attachHandlers() {
 			_ = cmd.Run(s, i)
 		}
 	})
+}
 
-	// (3) 기타 이벤트
-	b.AddHandler(handler.Hello("Open_Mind"))
+func (b *Bot) addHandlers() {
+	handlers := handler.All()
+	for _, h := range handlers {
+		b.AddHandler(h.HandlerFunc())
+	}
 }
